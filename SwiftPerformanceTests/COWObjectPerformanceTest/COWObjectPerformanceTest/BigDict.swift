@@ -8,37 +8,31 @@
 
 struct BigDict<K:Hashable,V> {
         init() {
-                self.box = Box([:])
+                self.cowbox = COWBox([:])
         }
         var state: [K: V] {
                 get {
-                        return box.state
+                        return cowbox.state
                 }
                 set {
-                        if isUniquelyReferenced(&box) == false {
-                                box = Box(newValue)
+                        if isUniquelyReferenced(&cowbox) == false {
+                                cowbox = COWBox(newValue)
                         }
                         else {
-                                box.state = newValue
+                                cowbox.state = newValue
                         }
                 }
         }
         subscript(k: K) -> V? {
-                get {
-                        return box.state[k]
-                }
-                set {
-                        box.state[k] = newValue
-                }
+                get { return cowbox.state[k] }
+                set { cowbox.state[k] = newValue }
         }
         var count: Int {
-                get {
-                        return box.state.count
-                }
+                get { return cowbox.state.count }
         }
-        private var box: Box<[K: V]>
+        private var cowbox: COWBox<[K: V]>
 }
-final class Box<T>: NonObjectiveCBase {
+final class COWBox<T>: NonObjectiveCBase {
         init(_ state: T) {
                 self.state = state
         }
